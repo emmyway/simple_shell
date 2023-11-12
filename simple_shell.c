@@ -1,4 +1,7 @@
 #include "main.h"
+
+extern char **environ;
+
 /**
  * main - entry of program
  * description: this is a student simple shell project that is
@@ -14,22 +17,36 @@ int main(void)
 	char **arr = malloc(sizeof(char *) * 1024);
 	char *token;
 	pid_t  fork_pid;
-	int n_read, status, i = 0;
+	int n_read, status, i;
 
 	while (1)
 	{
 		write(1, "#cisfun$ ", 9);
 
 		n_read = getline(&buffer, &buf_size, stdin);
+
 		if (n_read == -1)
 		{
+			if (feof(stdin))
+			{
+				free(buffer);
+				free(arr);
+				write(1, "\n", 1);
+				exit(0);
+			}
+
 			free(buffer);
+			free(arr);
 			perror("getline error:");
 			exit(EXIT_FAILURE);
 		}
 
+		else if (n_read == 1)
+			continue;
+
 		token = strtok(buffer, " \t\n");
 
+		i = 0;
 		while (token)
 		{
 			arr[i] = token;
@@ -40,7 +57,7 @@ int main(void)
 		fork_pid = fork();
 		if (fork_pid == 0)
 		{
-			if (execve(arr[0], arr, NULL) == -1)
+			if (execve(arr[0], arr, environ) == -1)
 			{
 				perror("execve:");
 				free(buffer);
@@ -52,6 +69,7 @@ int main(void)
 		{
 			wait(&status);
 		}
+
 	}
 	free(buffer);
 	free(arr);
