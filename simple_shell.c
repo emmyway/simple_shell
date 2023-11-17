@@ -21,7 +21,7 @@ int main(void)
 
 	while (1)
 	{
-		write(1, "#cisfun$ ", 9);
+		write(1, "simple_shell ", 13);
 
 		n_read = getline(&buffer, &buf_size, stdin);
 
